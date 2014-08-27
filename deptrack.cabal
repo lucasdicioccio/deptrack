@@ -19,6 +19,6 @@ library
   exposed-modules:     Deptrack, Deptrack.Applicative
   -- other-modules:       
   other-extensions:    DeriveFunctor
-  build-depends:       base >=4.7 && <4.8, containers >=0.5 && <0.6, free >=4.9 && < 4.10
+  build-depends:       base >=4.7 && <4.8, containers >=0.5 && <0.6, free >=4.9 && < 4.10, dotgen >=0.4.1 && <0.5
   hs-source-dirs:      src
   default-language:    Haskell2010

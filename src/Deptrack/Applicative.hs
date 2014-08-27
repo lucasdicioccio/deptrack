@@ -1,16 +1,28 @@
 {-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE TupleSections #-}
 
 module Deptrack.Applicative (
-    rec, nest, value, evalTree
+    DepTrack
+  -- basic building blocks
+  , rec, nest, value
+  -- tree-representation
+  , evalTree
   , drawDeps
-  , DepTrack
-  , module Data.Tree
+  -- graph-representation
+  , GraphWithLookupFunctions
+  , evalGraph
+  -- re-export applicative
   , module Control.Applicative
   ) where
 
-import Control.Applicative.Free
+import Control.Applicative.Free (Ap (..), liftAp)
 import Control.Applicative ((<$>), (<*), (*>), (<*>), pure)
-import Data.Tree
+import Control.Arrow ((&&&))
+import Data.Monoid (Monoid, (<>))
+import Data.Tree (Tree (..), drawTree)
+import Data.Set (Set, singleton, toList)
+import Data.Map.Strict (Map, fromListWith, toDescList)
+import Data.Graph (Graph, Vertex, graphFromEdges)
 
 -- | Dependency-tree building steps we can either push/pop dependency levels or
 -- record values.
@@ -114,6 +126,47 @@ evalTree' c (t:ts) (Ap (Pop v) next)   =
 
     where graftChild parent@(Node x xs) child@(Node y ys) = Node x (child:xs)
 
+
+------------------------------------------------------------------------------
+
+-- | Generic list summary function.
+--
+-- Values for a same key gets crunched together using to the Monoid property of
+-- the value space.
+--
+-- example: countBy f = aggolmerate f (const (Sum 1))
+agglomerate :: (Ord k, Monoid v) => 
+     (a -> k)  -- ^ projection to a key space
+  -> (a -> v)  -- ^ projection to a value space
+  -> [a]       -- ^ list of items to summarize
+  -> Map k v
+agglomerate fk fv = fromListWith (<>) . (map (fk &&& fv))
+
+-- | Generates the list of directed pairs for a tree.
+dagPairs :: Tree a -> [(a, a)]
+dagPairs (Node x []) = [(x,x)]
+dagPairs (Node a ys) = map ((a,) . rootLabel) ys ++ concatMap dagPairs ys
+
+-- | Generates a graph with a Map node (Set node) representation from a list of
+-- directed pairs.
+mergePairs :: (Ord a) => [(a,a)] -> Map a (Set a)
+mergePairs = agglomerate fst (singleton . snd)
+
+-- | Generates a Graph and the associated Vertex lookup functions See
+-- Data.Graph.graphFromEdges
+pairsMapToGraph :: (Ord a) => Map a (Set a) -> GraphWithLookupFunctions a
+pairsMapToGraph = graphFromEdges . map (\(d, ds) -> (d, d, toList ds)) . toDescList
+
+type GraphWithLookupFunctions a = (Graph, Vertex -> (a, a, [a]), a -> Maybe Vertex)
+
+-- | Evaluates a computation and generate a dependency as a side-effect of
+-- computing the value.
+evalGraph :: (Ord b) => DepTrack b a -> (GraphWithLookupFunctions (Maybe b), a)
+evalGraph x = 
+  let (t,v) = evalTree x
+      g = mergePairs $ dagPairs t
+      g' = pairsMapToGraph g
+  in (g',v)
 
 ------------------------------------------------------------------------------
 

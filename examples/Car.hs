@@ -3,8 +3,9 @@
 -- | A car analogy.
 module Car where
 
-import Deptrack.Applicative
+import Deptrack
 import Data.Traversable (sequenceA)
+import Text.Dot (showDot)
 
 -- | A representation of our dependency
 --
@@ -41,7 +42,7 @@ data Gaz = Diesel | Gasoline | Electrical
 
 type Four a = (a,a,a,a)
 
-data Wheel = Wheel
+data Wheel = Wheel Int
   deriving (Show, Eq, Ord)
 
 instance (Show a) => IsDep (Four a)
@@ -51,10 +52,10 @@ instance IsDep Car
 
 -------------------- concise DSL -------------------
 
-wheel = dep (pure Wheel)
+wheel n = dep (pure $ Wheel n)
 diesel = dep (pure Diesel)
 gasoline = dep (pure Gasoline)
-wheels = dep ((,,,) <$> wheel <*> wheel <*> wheel <*> wheel)
+wheels = dep ((,,,) <$> wheel 1 <*> wheel 2 <*> wheel 3 <*> wheel 4)
 car brand g ws  = dep (Car (Brand brand) <$> g <*> ws)
 
 pigeot = car "pigeot" diesel wheels
@@ -63,5 +64,13 @@ fleet = sequenceA [pigeot, pigeot, rinault]
 
 -------------------- end usage -------------------
 
-example :: IO ()
-example = drawDeps fleet
+instance (ToDotInfos (Maybe Dependency)) where
+  toDotInfos x = [("label", show x)]
+
+data Example = PrintDot | PrintText
+  deriving (Show, Eq, Ord)
+
+example :: Example -> IO ()
+example PrintText = drawDeps fleet
+example PrintDot  = let (g,_) = evalGraph fleet in
+  putStrLn $ showDot $ dotGraph g
