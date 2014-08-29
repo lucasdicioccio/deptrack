@@ -1,23 +1,20 @@
 digraph G {
-u0[label="Nothing"];
-u1[label="Just (Dependency \"(Wheel 1,Wheel 2,Wheel 3,Wheel 4)\")"];
-u2[label="Just (Dependency \"Car (Brand \\\"pigeot\\\") Diesel (Wheel 1,Wheel 2,Wheel 3,Wheel 4)\")"];
-u3[label="Just (Dependency \"Car (Brand \\\"rinault\\\") Gasoline (Wheel 1,Wheel 2,Wheel 3,Wheel 4)\")"];
-u4[label="Just (Dependency \"Diesel\")"];
-u5[label="Just (Dependency \"Gasoline\")"];
-u6[label="Just (Dependency \"Wheel 1\")"];
-u7[label="Just (Dependency \"Wheel 2\")"];
-u8[label="Just (Dependency \"Wheel 3\")"];
-u9[label="Just (Dependency \"Wheel 4\")"];
-u0 -> u2;
-u0 -> u3;
-u1 -> u6;
-u1 -> u7;
-u1 -> u8;
-u1 -> u9;
-u2 -> u1;
+u0[label="Dependency \"(Wheel 1,Wheel 2,Wheel 3,Wheel 4)\""];
+u1[label="Dependency \"Car (Brand \\\"pigeot\\\") Diesel (Wheel 1,Wheel 2,Wheel 3,Wheel 4)\""];
+u2[label="Dependency \"Car (Brand \\\"rinault\\\") Gasoline (Wheel 1,Wheel 2,Wheel 3,Wheel 4)\""];
+u3[label="Dependency \"Diesel\""];
+u4[label="Dependency \"Gasoline\""];
+u5[label="Dependency \"Wheel 1\""];
+u6[label="Dependency \"Wheel 2\""];
+u7[label="Dependency \"Wheel 3\""];
+u8[label="Dependency \"Wheel 4\""];
+u0 -> u5;
+u0 -> u6;
+u0 -> u7;
+u0 -> u8;
+u1 -> u0;
+u1 -> u3;
+u2 -> u0;
 u2 -> u4;
-u3 -> u1;
-u3 -> u5;
 
 }

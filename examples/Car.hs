@@ -64,7 +64,7 @@ fleet = sequenceA [pigeot, pigeot, rinault]
 
 -------------------- end usage -------------------
 
-instance (ToDotInfos (Maybe Dependency)) where
+instance (ToDotInfos Dependency) where
   toDotInfos x = [("label", show x)]
 
 data Example = PrintDot | PrintText

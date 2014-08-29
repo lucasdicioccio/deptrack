@@ -18,6 +18,7 @@ module Deptrack.Applicative (
 import Control.Applicative.Free (Ap (..), liftAp)
 import Control.Applicative ((<$>), (<*), (*>), (<*>), pure)
 import Control.Arrow ((&&&))
+import Data.Maybe (catMaybes)
 import Data.Monoid (Monoid, (<>))
 import Data.Tree (Tree (..), drawTree)
 import Data.Set (Set, singleton, toList)
@@ -161,12 +162,17 @@ type GraphWithLookupFunctions a = (Graph, Vertex -> (a, a, [a]), a -> Maybe Vert
 
 -- | Evaluates a computation and generate a dependency as a side-effect of
 -- computing the value.
-evalGraph :: (Ord b) => DepTrack b a -> (GraphWithLookupFunctions (Maybe b), a)
+evalGraph :: (Ord b) => DepTrack b a -> (GraphWithLookupFunctions b, a)
 evalGraph x = 
   let (t,v) = evalTree x
-      g = mergePairs $ dagPairs t
+      g = mergePairs $ catMaybes $ map genuinePair $ dagPairs t
       g' = pairsMapToGraph g
   in (g',v)
+
+  where genuinePair (Nothing,_) = Nothing
+        genuinePair (_,Nothing) = Nothing
+        genuinePair (Just x, Just y) = Just (x,y)
+      
 
 ------------------------------------------------------------------------------
 
