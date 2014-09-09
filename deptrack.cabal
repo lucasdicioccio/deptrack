@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                deptrack
-version:             0.1.0.0
+version:             0.2.0.0
 synopsis:            Track dependencies while computing a value.
 -- description:         
 license:             Apache-2.0
@@ -16,7 +16,7 @@ build-type:          Simple
 cabal-version:       >=1.10
 
 library
-  exposed-modules:     Deptrack, Deptrack.Applicative
+  exposed-modules:     Deptrack, Deptrack.Applicative, Deptrack.Monadic, Deptrack.Graph
   -- other-modules:       
   other-extensions:    DeriveFunctor
   build-depends:       base >=4.7 && <4.8, containers >=0.5 && <0.6, free >=4.9 && < 4.10, dotgen >=0.4.1 && <0.5
