@@ -3,7 +3,8 @@
 -- | A car analogy.
 module Car where
 
-import Deptrack
+import Deptrack.Graph
+import Deptrack.Applicative
 import Data.Traversable (sequenceA)
 import Text.Dot (showDot)
 
