@@ -6,6 +6,7 @@ module Deptrack.Monadic (
     DepTrack
   -- basic building blocks
   , rec, nest, value
+  , evalTree
   , drawDeps
   -- graph-representation
   , GraphWithLookupFunctions
