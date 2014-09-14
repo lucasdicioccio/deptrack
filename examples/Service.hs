@@ -56,8 +56,8 @@ instance Ord Check where
 check :: String -> IO (Bool) -> Dependency
 check n x = Checkable $ Check n x
 
-site :: String -> Dependency
-site = Abstraction
+host :: String -> Dependency
+host = Abstraction
 
 pingDep :: String -> Dependency
 pingDep host = check ("can-ping: " ++ host) 
@@ -70,21 +70,37 @@ curlDep url = check ("can-curl: " ++ url)
 pingable = nest pingDep
 curlable = nest curlDep
 
-webServer x = do
-  nest site (bookmyname)
+webServer x = nest host $ do
   curlable (pure x)
   pingable (pure x)
 
-dnsRoot x = do
+dnsRoot x = nest host $ do
   pingable (pure x)
 
-dicioccio    = webServer "dicioccio.fr"
-haskellParis = webServer "haskell-paris.fr"
-probecraft   = webServer "probecraft.net"
-bookmyname   = dnsRoot "bookmyname.com"
-neverworks   = webServer "example.42.local"
+lautre = nest host $ do
+  webServer "lautre.net"
 
-hostnames = traverse (nest site) [dicioccio, haskellParis, probecraft, neverworks]
+bookmyname = nest host $ do
+  dnsRoot "bookmyname.com"
+
+dicioccio    = nest host $ do
+  bookmyname
+  lautre
+  webServer "dicioccio.fr"
+
+haskellParis = do
+  bookmyname
+  webServer "haskell-paris.fr"
+
+probecraft   = do
+  bookmyname
+  webServer "probecraft.net"
+
+neverworks   = do
+  webServer "never-works.42.local"
+
+
+hostnames = traverse (nest host) [dicioccio, haskellParis, probecraft, neverworks]
 
 runDeps cache (Node Nothing xs)    = all id <$> mapConcurrently (runDeps cache) xs
 runDeps cache (Node (Just dep) xs) = all id <$> zs
