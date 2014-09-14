@@ -1,0 +1,30 @@
+digraph G {
+u0[color="green",label="bookmyname.com",shape="egg"];
+u1[color="green",label="dicioccio.fr",shape="egg"];
+u2[color="green",label="example.42.local",shape="egg"];
+u3[color="green",label="haskell-paris.fr",shape="egg"];
+u4[color="green",label="probecraft.net",shape="egg"];
+u5[color="green",label="can-curl: dicioccio.fr",shape="rectangle"];
+u6[color="red",label="can-curl: example.42.local",shape="rectangle"];
+u7[color="green",label="can-curl: haskell-paris.fr",shape="rectangle"];
+u8[color="green",label="can-curl: probecraft.net",shape="rectangle"];
+u9[color="green",label="can-ping: bookmyname.com",shape="rectangle"];
+u10[color="green",label="can-ping: dicioccio.fr",shape="rectangle"];
+u11[color="red",label="can-ping: example.42.local",shape="rectangle"];
+u12[color="green",label="can-ping: haskell-paris.fr",shape="rectangle"];
+u13[color="green",label="can-ping: probecraft.net",shape="rectangle"];
+u0 -> u9;
+u1 -> u0;
+u1 -> u5;
+u1 -> u10;
+u2 -> u0;
+u2 -> u6;
+u2 -> u11;
+u3 -> u0;
+u3 -> u7;
+u3 -> u12;
+u4 -> u0;
+u4 -> u8;
+u4 -> u13;
+
+}
