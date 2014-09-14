@@ -82,8 +82,9 @@ dicioccio    = webServer "dicioccio.fr"
 haskellParis = webServer "haskell-paris.fr"
 probecraft   = webServer "probecraft.net"
 bookmyname   = dnsRoot "bookmyname.com"
+neverworks   = webServer "example.42.local"
 
-hostnames = traverse (nest site) [dicioccio, haskellParis, probecraft]
+hostnames = traverse (nest site) [dicioccio, haskellParis, probecraft, neverworks]
 
 runDeps cache (Node Nothing xs)    = all id <$> mapConcurrently (runDeps cache) xs
 runDeps cache (Node (Just dep) xs) = all id <$> zs
@@ -118,13 +119,20 @@ example = do
   let x = fst $ evalTree hostnames
   newCache >>= flip runDeps x
 
-example2 :: IO ()
+instance ToDotInfos (Dependency, Maybe Bool) where
+  toDotInfos (x,Nothing)       = ("color","blue") : toDotInfos x
+  toDotInfos (x,Just True)     = ("color","green") : toDotInfos x
+  toDotInfos (x,Just False)    = ("color","red") : toDotInfos x
+
+example2 :: IO (Dot ())
 example2 = do
   let ((g,f1,f2),_) = evalGraph hostnames
   let rs = roots g
   cache <- newCache
   mapConcurrently (go cache g f1) rs
-  return ()
+  r <- atomically $ readTVar cache >>= traverse readTMVar
+  let f1' idx = let (d,_,_) = f1 idx in ((d,join $ lookup d r), undefined, undefined)
+  return $ dotGraph (g,f1',undefined)
   where go c g f idx = do
                  let (dependency,_,_) = (f idx)
                  runOne c dependency
