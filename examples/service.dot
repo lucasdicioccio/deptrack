@@ -1,10 +1,10 @@
 digraph G {
-u0[color="green",label="bookmyname.com",shape="egg"];
-u1[color="green",label="dicioccio.fr",shape="egg"];
-u2[color="green",label="haskell-paris.fr",shape="egg"];
-u3[color="green",label="lautre.net",shape="egg"];
-u4[color="green",label="never-works.42.local",shape="egg"];
-u5[color="green",label="probecraft.net",shape="egg"];
+u0[label="bookmyname.com",shape="egg"];
+u1[label="dicioccio.fr",shape="egg"];
+u2[label="haskell-paris.fr",shape="egg"];
+u3[label="lautre.net",shape="egg"];
+u4[label="never-works.42.local",shape="egg"];
+u5[label="probecraft.net",shape="egg"];
 u6[color="green",label="can-curl: dicioccio.fr",shape="rectangle"];
 u7[color="green",label="can-curl: haskell-paris.fr",shape="rectangle"];
 u8[color="green",label="can-curl: lautre.net",shape="rectangle"];
@@ -16,6 +16,7 @@ u13[color="green",label="can-ping: haskell-paris.fr",shape="rectangle"];
 u14[color="green",label="can-ping: lautre.net",shape="rectangle"];
 u15[color="red",label="can-ping: never-works.42.local",shape="rectangle"];
 u16[color="green",label="can-ping: probecraft.net",shape="rectangle"];
+u17[color="red",label="can-ssh: probecraft.net",shape="rectangle"];
 u0 -> u11;
 u1 -> u0;
 u1 -> u3;
@@ -31,5 +32,6 @@ u4 -> u15;
 u5 -> u0;
 u5 -> u10;
 u5 -> u16;
+u5 -> u17;
 
 }
