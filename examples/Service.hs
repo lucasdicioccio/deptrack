@@ -37,7 +37,7 @@ data Check = Check {
   }
 
 depAction (Checkable (Check _ x)) = x
-depAction s                       = print s >> return True
+depAction s                       = print s >> return False
 
 instance ToDotInfos Dependency where
   toDotInfos (Checkable (Check k _)) = [("label",k), ("shape","rectangle")]
@@ -67,8 +67,13 @@ curlDep :: String -> Dependency
 curlDep url = check ("can-curl: " ++ url) 
                     ((==ExitSuccess) <$> rawSystem "curl" ["-i", url])
 
+sshDep :: String -> Dependency
+sshDep host = check ("can-ssh: " ++ host) 
+                   ((==ExitSuccess) <$> rawSystem "ssh" [host, "echo hi"])
+
 pingable = nest pingDep
 curlable = nest curlDep
+sshable  = nest sshDep
 
 webServer x = nest host $ do
   curlable (pure x)
@@ -94,6 +99,7 @@ haskellParis = do
 
 probecraft   = do
   bookmyname
+  sshable (pure "probecraft.net")
   webServer "probecraft.net"
 
 neverworks   = do
@@ -136,6 +142,7 @@ example = do
   newCache >>= flip runDeps x
 
 instance ToDotInfos (Dependency, Maybe Bool) where
+  toDotInfos (Abstraction k, _)= [("label",k), ("shape","egg")]
   toDotInfos (x,Nothing)       = ("color","blue") : toDotInfos x
   toDotInfos (x,Just True)     = ("color","green") : toDotInfos x
   toDotInfos (x,Just False)    = ("color","red") : toDotInfos x
@@ -154,3 +161,22 @@ example2 = do
                  runOne c dependency
                  let children = (A.!) g idx
                  concat <$> mapConcurrently (go c g f) children
+
+
+example3 = do
+  let ((g,f1,f2),_) = evalGraph hostnames
+  let rs = roots g
+  cache <- newCache
+  mapConcurrently (go cache g f1) rs
+  r <- atomically $ readTVar cache >>= traverse readTMVar
+  let f1' idx = let (d,_,_) = f1 idx in ((d,join $ lookup d r), undefined, undefined)
+  return $ dotGraph (g,f1',undefined)
+  where go c g f idx = do
+                 let (dependency,_,_) = (f idx)
+                 x <- runOne c dependency
+                 if x
+                 then
+                      return []
+                 else do
+                      let children = (A.!) g idx
+                      concat <$> mapConcurrently (go c g f) children
