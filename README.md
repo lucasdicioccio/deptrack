@@ -50,6 +50,14 @@ dependencies with DepTrack. Existing "combinators" from Data.Traversable
 (sequenceA) and Control.Applicative (<$> et al.) let you write type-checked
 helpers.
 
+A more complex example in example/Service.hs provides a more-in-depth example
+than example/Car.hs . The Service example represents some Internet services
+that I want to run (namely, websites). These services must be working according
+to some simple rules. We define a DSL to express what is a 'check' (an action
+to tell whether the service works) and how to define new services.  We further
+provide a function which walks the graph of services and tries to locate faulty
+services in the dependency graph.
+
 ## Possible uses
 
 DepTrack already provides enough to generate "Graphviz visualizations", such
@@ -80,8 +88,8 @@ dependency graph for documentation purposes only.
 
 ## Implementation
 
-The applicative functor is implemented using the Ap free-applicative from the
-`free` package. 
+The applicative functor is implemented using the Ap free-(applicative/monad)
+from the `free` package. 
 
 Dependencies of type `a` are encoded in a `Data.Tree (Maybe a)`. The children
 of a node are the node's direct dependencies.
@@ -99,11 +107,5 @@ please file a bug report (GitHub issue).
 * DepTrack cannot directly express "alternate paths" (e.g. "A" depends on "B OR
   C").  A possible workaround is to enrich the dependency type.
 * The `evalTree` computation must terminate (especially, we cannot express a
-  lazily-computed infinite list of dependencies.)
-* DepTrack cannot encode loops. You should not have loops in your design,
-  however we may still want to let people represent them. DepTrack needs some
-  primitive to stop iterating on a dependency when an already-explored node
-  arrives.
-
-# TODO
-* implement designs for Monad, Alternative, and MonadPlus versions
+  lazily-computed infinite list of dependencies.) In particular, DepTrack
+  cannot encode loops.
