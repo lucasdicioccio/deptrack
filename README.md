@@ -3,7 +3,7 @@ THIS PROJECT HAS MOVED
 
 You are looking at an old version of DepTrack. A newer, up-to-date,
 better-documented version with more features and better performance is
-available at: [DepTrack-Project Repository](http://github.com/lucasdicioccio/deptrack-project)
+available at: [DepTrack-Project Repository](https://github.com/lucasdicioccio/deptrack-project)
 
 DepTrack
 ========
